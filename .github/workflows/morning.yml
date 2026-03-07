@@ -2,7 +2,7 @@ name: Morning Discord Message
 
 on:
   schedule:
-    - cron: "40 17 * * *"   # every day
+    - cron: "0 1 * * *"   # every day
   workflow_dispatch:
 
 jobs:
