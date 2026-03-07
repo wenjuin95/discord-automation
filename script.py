@@ -1,5 +1,5 @@
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 
 WEBHOOK_URL = os.environ["DISCORD_WEBHOOK"]
@@ -12,10 +12,14 @@ weather = requests.get(
 temp = weather["current_weather"]["temperature"]
 
 # ---------- DATE ----------
-now = datetime.now()
-day = now.strftime("%A")
-date = now.strftime("%d %B %Y")
-time = now.strftime("%H:%M")
+# Malaysia timezone offset
+MYT_OFFSET = 8
+
+now_utc = datetime.utcnow()
+now_myt = now_utc + timedelta(hours=MYT_OFFSET)
+day = now_myt.strftime("%A")
+date = now_myt.strftime("%d %B %Y")
+time = now_myt.strftime("%H:%M")
 
 # ---------- MESSAGE ----------
 message = f"""
