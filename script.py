@@ -11,15 +11,6 @@ weather = requests.get(
 
 temp = weather["current_weather"]["temperature"]
 
-# ---------- QUOTE ----------
-try:
-	quote_data = requests.get("https://api.quotable.io/random").json()
-	quote = quote_data["content"]
-	author = quote_data["author"]
-except:
-	quote = "No quote available today"
-	author = ""
-
 # ---------- DATE ----------
 now = datetime.now()
 day = now.strftime("%A")
