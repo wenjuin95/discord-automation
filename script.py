@@ -1,7 +1,8 @@
 import requests
 from datetime import datetime
+import os
 
-WEBHOOK_URL = "https://discord.com/api/webhooks/1479871220450328626/lvs9LPqNuJxocxRY73x47DZ_xKkJlD-_pqC89xsU-7g1uIT6s0qJ_Bncly_l-R9WfNq5"
+WEBHOOK_URL = os.environ["DISCORD_WEBHOOK"]
 
 # ---------- WEATHER ----------
 weather = requests.get(
