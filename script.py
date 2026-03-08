@@ -1,6 +1,10 @@
 from datetime import datetime, timedelta
+import pytz
 import requests
 import os
+
+tz = pytz.timezone("Asia/Kuala_Lumpur")
+now = datetime.now(tz)
 
 WEBHOOK_URL = os.environ["DISCORD_WEBHOOK"]
 
@@ -32,8 +36,12 @@ message = f"""
 Have a great day everyone 🚀
 """
 
-requests.post(WEBHOOK_URL, json={
-	"username": "Morning Bot",
-	"content": message
-})
-print("Message sent to Discord!")
+# Only allow 09:00–09:04
+if now.hour == 9 and now.minute < 5:
+    requests.post(os.environ["DISCORD_WEBHOOK"], json={
+		"username": "Morning bot"
+        "content": "Good morning!"
+    })
+    print("Message sent")
+else:
+    print("Not the correct time")
