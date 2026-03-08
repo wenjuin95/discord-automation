@@ -2,7 +2,7 @@ name: Morning Discord Message
 
 on:
   schedule:
-    - cron: "*/5 1 * * *"   # every day
+    - cron: "*/5 * * * *"   # every day
   workflow_dispatch:
 
 jobs:
@@ -19,7 +19,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install requests
-        run: pip install requests
+        run: pip install requests pytz
 
       - name: Run script
         run: python script.py
