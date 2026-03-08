@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import pytz
 import requests
 import os
@@ -37,7 +37,7 @@ tz = pytz.timezone("Asia/Kuala_Lumpur")
 now = datetime.now(tz)
 
 # only allow 9:00 - 9:04
-if now.hour == 14 and now.minute < 45:
+if now.hour == 14 and 40 <= now.minute < 45:
 	requests.post(WEBHOOK_URL, json={
 		"username": "Morning Bot",
 		"content": message
