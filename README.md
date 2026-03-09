@@ -25,7 +25,7 @@ GitHub Actions (cron every 5 min)
         └── POSTs message to Discord Webhook
 ```
 
-## Setup
+## Setup On Github Action
 
 ### 1. Create a Discord Webhook
 
@@ -71,9 +71,8 @@ Follow these steps to run the bot on your local machine for development or testi
 
 ### Prerequisites
 
-- **Python 3.8+** — [Download Python](https://www.python.org/downloads/)
-- **pip** — usually bundled with Python
-- A **Discord Webhook URL** — see the [Setup](#setup) section above to create one
+- **Python**
+- **pip**
 
 ### 1. Clone the Repository
 
@@ -115,18 +114,6 @@ $env:DISCORD_WEBHOOK = "https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN"
 ```bash
 python script.py
 ```
-
-### Expected Output
-
-The script checks the current Malaysia Time (UTC+8) and behaves as follows:
-
-| Scenario | Console output |
-|---|---|
-| Inside a greeting window and message not yet sent today | `Message sent` |
-| Inside a greeting window but message already sent today | `Already sent today` |
-| Outside all greeting windows | `Not the correct time` |
-
-> **Greeting windows** are: 08:00–08:59 (Morning), 12:00–12:59 (Afternoon), 17:00–17:59 (Evening), 21:00–21:59 (Night) — all in Malaysia Time.
 
 ### 5. Schedule with Crontab (macOS / Linux)
 
