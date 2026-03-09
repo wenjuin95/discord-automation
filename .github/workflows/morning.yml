@@ -26,3 +26,11 @@ jobs:
         run: python script.py
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+
+      - name: Commit state file
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          git add last_sent.txt
+          git commit -m "Update last sent state" || echo "No changes"
+          git push
