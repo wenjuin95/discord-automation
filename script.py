@@ -1,18 +1,16 @@
 from datetime import datetime
-import pytz
-import requests
-import os
+import pytz # timezone handling
+import requests # HTTP requests
+import os # environment variables and file handling
 
 tz = pytz.timezone("Asia/Kuala_Lumpur")
 now = datetime.now(tz)
-
 WEBHOOK_URL = os.environ["DISCORD_WEBHOOK"]
 
 # ---------- WEATHER ----------
 weather = requests.get(
     "https://api.open-meteo.com/v1/forecast?latitude=3.043&longitude=101.580&current_weather=true"
 ).json()
-
 temp = weather["current_weather"]["temperature"]
 code = weather["current_weather"]["weathercode"]
 
@@ -51,6 +49,7 @@ message = f"""
 Have a great day everyone 🚀
 """
 
+# ---------- GREETING ----------
 greeting = None
 tag = None
 
@@ -91,8 +90,3 @@ if greeting:
         print("Already sent today")
 else:
     print("Not the correct time")
-#requests.post(
-#    os.environ["DISCORD_WEBHOOK"],
-#    json={"username": "MAKAN", "content": message},
-#)
-#print("Message sent")

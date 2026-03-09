@@ -2,7 +2,8 @@ name: Morning Discord Message
 
 on:
   schedule:
-    - cron: "*/5 * * * *"   # every day
+    - cron: "*/5 * * * *"   # every 5 minutes
+  # Allows you to manually trigger the workflow from the GitHub Actions tab
   workflow_dispatch:
 
 jobs:
