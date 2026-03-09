@@ -1,14 +1,10 @@
-# Discord Automation 🤖
+# Discord Automation
 
 A GitHub Actions-powered bot that automatically sends daily greetings with live weather information to a Discord channel via webhook.
 
 ## Features
 
-- 📅 Sends time-based greetings throughout the day:
-  - 🌅 **Good Morning** (08:00 – 09:00)
-  - 🌤️ **Good Afternoon** (12:00 – 13:00)
-  - 🌆 **Good Evening** (17:00 – 18:00)
-  - 🌃 **Good Night** (21:00 – 22:00)
+- 📅 Sends time-based greetings throughout the day
 - 🌡️ Includes real-time weather for **Subang, Malaysia** (temperature + weather icon)
 - ⏰ Displays the current day, date, and time (Malaysia Time, UTC+8)
 - 🔒 Deduplication guard — each greeting is sent only once per day
@@ -29,25 +25,13 @@ GitHub Actions (cron every 5 min)
         └── POSTs message to Discord Webhook
 ```
 
-## Example Discord Message
-
-```
-🌅 Good Morning!
-
-📅 Monday, 09 March 2026
-⏰ 08:05
-🌤 Subang 27°C
-
-Have a great day everyone 🚀
-```
-
 ## Setup
 
 ### 1. Create a Discord Webhook
 
 1. Open your Discord server.
 2. Go to **Channel Settings → Integrations → Webhooks**.
-3. Click **New Webhook**, give it a name (e.g. `MAKAN`), and copy the webhook URL.
+3. Click **New Webhook**, give it a name (e.g. `Test`), and copy the webhook URL.
 
 ### 2. Add the Webhook URL as a GitHub Secret
 
@@ -99,7 +83,3 @@ python script.py
 Weather data is provided by [Open-Meteo](https://open-meteo.com/) — a free, open-source weather API. No API key required.
 
 The location is set to **Subang, Selangor, Malaysia** (latitude `3.043`, longitude `101.580`).
-
-## License
-
-This project is open source and available under the [MIT License](LICENSE).
