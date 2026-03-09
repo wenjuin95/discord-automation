@@ -65,18 +65,74 @@ discord-automation/
 
 Dependencies are installed automatically by the GitHub Actions workflow.
 
-## Local Development
+## Local Setup Guide
+
+Follow these steps to run the bot on your local machine for development or testing.
+
+### Prerequisites
+
+- **Python 3.8+** — [Download Python](https://www.python.org/downloads/)
+- **pip** — usually bundled with Python
+- A **Discord Webhook URL** — see the [Setup](#setup) section above to create one
+
+### 1. Clone the Repository
 
 ```bash
-# Install dependencies
+git clone https://github.com/wenjuin95/discord-automation.git
+cd discord-automation
+```
+
+### 2. Install Dependencies
+
+```bash
 pip install requests pytz
+```
 
-# Set the webhook URL
-export DISCORD_WEBHOOK="https://discord.com/api/webhooks/..."
+### 3. Configure the Webhook URL
 
-# Run the script
+Set the `DISCORD_WEBHOOK` environment variable to your Discord webhook URL.
+
+**macOS / Linux:**
+
+```bash
+export DISCORD_WEBHOOK="https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN"
+```
+
+**Windows (Command Prompt):**
+
+```cmd
+set DISCORD_WEBHOOK=https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN
+```
+
+**Windows (PowerShell):**
+
+```powershell
+$env:DISCORD_WEBHOOK = "https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN"
+```
+
+### 4. Run the Script
+
+```bash
 python script.py
 ```
+
+### Expected Output
+
+The script checks the current Malaysia Time (UTC+8) and behaves as follows:
+
+| Scenario | Console output |
+|---|---|
+| Inside a greeting window and message not yet sent today | `Message sent` |
+| Inside a greeting window but message already sent today | `Already sent today` |
+| Outside all greeting windows | `Not the correct time` |
+
+> **Greeting windows** are: 08:00–08:59 (Morning), 12:00–12:59 (Afternoon), 17:00–17:59 (Evening), 21:00–21:59 (Night) — all in Malaysia Time.
+
+### Notes
+
+- The deduplication state is stored in `last_sent.txt` in the project root. Delete this file to force-resend a greeting during testing.
+- Weather data is fetched live from the [Open-Meteo API](https://open-meteo.com/) — no API key is required.
+- To test outside of a greeting window, temporarily adjust the hour-checking conditions in `script.py` to match the current time.
 
 ## Weather API
 
