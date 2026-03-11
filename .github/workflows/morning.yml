@@ -1,5 +1,8 @@
 name: Morning Discord Message
 
+permissions:
+  contents: write
+  
 on:
   schedule:
     - cron: "*/5 * * * *"   # every 5 minutes
@@ -26,6 +29,11 @@ jobs:
         run: python script.py
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Commit state file
         run: |
