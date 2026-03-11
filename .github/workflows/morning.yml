@@ -30,6 +30,9 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
 
+      - name: Check last_sent
+        run: cat last_sent.txt
+
       - name: Checkout code
         uses: actions/checkout@v4
         with:
