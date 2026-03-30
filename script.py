@@ -11,7 +11,6 @@ WEBHOOK_URL = os.environ["DISCORD_WEBHOOK"]
 weather = requests.get(
     "https://api.open-meteo.com/v1/forecast?latitude=3.043&longitude=101.580&current_weather=true"
 ).json()
-temp = weather["current_weather"]["temperature"]
 code = weather["current_weather"]["weathercode"]
 
 # ---------- TIME ----------
@@ -44,7 +43,7 @@ icon = weather_icon(code)
 message = f"""
 📅 {day}, {date}
 ⏰ {time}
-{icon} Subang {temp}°C
+{icon} Subang
 
 Have a great day everyone 🚀
 """
