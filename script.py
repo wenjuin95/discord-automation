@@ -9,9 +9,21 @@ WEBHOOK_URL = os.environ["DISCORD_WEBHOOK"]
 
 # ---------- WEATHER ----------
 weather = requests.get(
-    "https://api.open-meteo.com/v1/forecast?latitude=3.043&longitude=101.580&current_weather=true"
+	"https://api.data.gov.my/weather/forecast?contains=Subang@location__location_name"
 ).json()
-code = weather["current_weather"]["weathercode"]
+
+for key in weather:
+	today_date = datetime.now().date()
+	today_hour = datetime.now().hour
+	temp = key['max_temp']
+	if key['date'] == str(today_date):
+		if today_hour < 12:
+			weather_text = key['morning_forecast']
+		elif today_hour < 18:
+			weather_text = key['afternoon_forecast']
+		else:
+			weather_text = key['night_forecast']
+		break
 
 # ---------- TIME ----------
 day = now.strftime("%A")
@@ -19,31 +31,36 @@ date = now.strftime("%d %B %Y")
 time = now.strftime("%H:%M")
 
 # ---------- FUNCTION ----------
-def weather_icon(code):
-    if code == 0:
-        return "☀️"   # clear sky
-    elif code in [1, 2]:
-        return "🌤"   # partly cloudy
-    elif code == 3:
-        return "☁️"   # cloudy
-    elif code in [45, 48]:
-        return "🌫"   # fog
-    elif code in [51, 53, 55, 61, 63, 65]:
-        return "🌧"   # rain
-    elif code in [71, 73, 75]:
-        return "❄️"   # snow
-    elif code in [95, 96, 99]:
-        return "⛈"   # thunderstorm
-    else:
-        return "🌡"
+def get_weather_icon(forecast_text):
+	match forecast_text:
+		case "Tiada hujan":
+			return "☀️ "
+
+		case "Berjerebu":
+			return "🌫️ "
+
+		case "Hujan" | "Hujan di beberapa tempat" | "Hujan di satu dua tempat":
+			return "🌧️ "
+
+		case "Hujan di satu dua tempat di kawasan pantai" | "Hujan di satu dua tempat di kawasan pedalaman":
+			return "🌦️ "
+
+		case "Ribut petir" | "Ribut petir di beberapa tempat" | "Ribut petir di satu dua tempat":
+			return "⛈️ "
+
+		case "Ribut petir di satu dua tempat di kawasan pantai" | "Ribut petir di satu dua tempat di kawasan pedalaman":
+			return "🌩️ "
+
+		case _:
+			return "🌡️ "
 
 # ---------- MESSAGE ----------
-icon = weather_icon(code)
+icon = get_weather_icon(weather_text)
 
 message = f"""
 📅 {day}, {date}
 ⏰ {time}
-{icon} Subang
+{icon} Subang ({temp}°C)
 
 Have a great day everyone 🚀
 """
@@ -53,39 +70,41 @@ greeting = None
 tag = None
 
 if 8 <= now.hour < 9:
-    greeting = "🌅 **Good Morning!**"
-    tag = "morning"
+	greeting = "🌅 **Good Morning!**"
+	tag = "morning"
 elif 12 <= now.hour < 13:
-    greeting = "🌤️ **Good Afternoon!**"
-    tag = "afternoon"
+	greeting = "🌤️ **Good Afternoon!**"
+	tag = "afternoon"
 elif 17 <= now.hour < 18:
-    greeting = "🌆 **Good Evening!**"
-    tag = "evening"
+	greeting = "🌆 **Good Evening!**"
+	tag = "evening"
 elif 21 <= now.hour < 22:
-    greeting = "🌃 **Good Night!**"
-    tag = "night"
+	greeting = "🌃 **Good Night!**"
+	tag = "night"
+
+print(message)
 
 if greeting:
-    today = now.strftime("%Y-%m-%d")
-    state_file = "last_sent.txt"
+	today = now.strftime("%Y-%m-%d")
+	state_file = "last_sent.txt"
 
-    last = ""
-    if os.path.exists(state_file):
-        with open(state_file) as f:
-            last = f.read().strip()
+	last = ""
+	if os.path.exists(state_file):
+		with open(state_file) as f:
+			last = f.read().strip()
 
-    current = f"{today}-{tag}"
+	current = f"{today}-{tag}"
 
-    if last != current:
-        requests.post(
-            WEBHOOK_URL,
-            json={"username": "MAKAN", "content": greeting + message},
-        )
-        print("Message sent")
+	if last != current:
+		requests.post(
+			WEBHOOK_URL,
+			json={"username": "MAKAN", "content": greeting + message},
+		)
+		print("Message sent")
 
-        with open(state_file, "w") as f:
-            f.write(current)
-    else:
-        print("Already sent today")
+		with open(state_file, "w") as f:
+			f.write(current)
+	else:
+		print("Already sent today")
 else:
-    print("Not the correct time")
+	print("Not the correct time")
