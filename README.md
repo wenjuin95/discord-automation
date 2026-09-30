@@ -1,78 +1,63 @@
 # Discord Automation
 
-A GitHub Actions-powered bot that automatically sends daily greetings with live weather information to a Discord channel via webhook.
+An automation script that sends scheduled daily greetings, live weather, Air Quality Index (AQI) reports, and AI-powered lifestyle advice to a Discord channel via webhook.
+
+---
 
 ## Features
 
-- 📅 Sends time-based greetings throughout the day
-- 🌡️ Includes real-time weather for **Subang, Malaysia** (temperature + weather icon)
-- ⏰ Displays the current day, date, and time (Malaysia Time, UTC+8)
-- 🔒 Deduplication guard — each greeting is sent only once per day
-- ⚡ Runs automatically every 5 minutes via GitHub Actions (only posts during the greeting windows)
+- 📅 **Scheduled Greetings:** Automatically posts time-based messages (Morning, Afternoon, Evening, Night).
+- 🌡️ **Live Weather & AQI:** Fetches real-time temperature, humidity, weather conditions, and US AQI levels for **Subang Jaya, Malaysia** via Open-Meteo.
+- 💡 **Gemini AI Advisor:** Uses Google Gemini to generate context-aware, practical advice based on live weather and air quality conditions.
+- ⏰ **Localized Time:** Accurately pinned to Malaysia Time (Asia/Kuala_Lumpur, UTC+8).
+- 🔒 **Deduplication Guard:** Prevents duplicate postings within the same time window using a local state file (`last_sent.txt`).
+- ⚙️ **Automated Execution:** Runs on schedule using system `cron` or Task Scheduler.
+
+---
 
 ## How It Works
 
 ```
-GitHub Actions (cron every 5 min)
-        │
-        ▼
-  script.py runs
-        │
-        ├── Fetches current weather from Open-Meteo API
-        ├── Checks current Malaysia time
-        ├── Determines if it's a greeting window (morning/afternoon/evening/night)
-        ├── Checks last_sent.txt to avoid duplicate messages
-        └── POSTs message to Discord Webhook
+System Cron (e.g., hourly)
+│
+▼
+script.py
+│
+├── Checks current Malaysia time (UTC+8)
+├── Identifies if it's within a greeting window
+├── Reads last_sent.txt (exits early if already sent)
+│
+├── Fetches Weather & AQI from Open-Meteo APIs
+├── Sends environmental data to Gemini
+├── Receives concise AI advisory message
+│
+├── POSTs final formatted embed/message to Discord Webhook
+└── Updates last_sent.txt with current state
 ```
 
-## Setup On Github Action
-
-### 1. Create a Discord Webhook
-
-1. Open your Discord server.
-2. Go to **Channel Settings → Integrations → Webhooks**.
-3. Click **New Webhook**, give it a name (e.g. `Test`), and copy the webhook URL.
-
-### 2. Add the Webhook URL as a GitHub Secret
-
-1. In your repository, go to **Settings → Secrets and variables → Actions**.
-2. Click **New repository secret**.
-3. Name it `DISCORD_WEBHOOK` and paste the webhook URL as the value.
-
-### 3. Enable GitHub Actions
-
-GitHub Actions is already configured in `.github/workflows/morning.yml`. Once the secret is set, the workflow will run automatically on schedule.
-
-You can also trigger it manually from the **Actions** tab using the **workflow_dispatch** option.
-
-## Project Structure
-
-```
-discord-automation/
-├── .github/
-│   └── workflows/
-│       └── morning.yml   # GitHub Actions workflow (runs every 5 min)
-├── script.py             # Main automation script
-└── README.md
-```
+---
 
 ## Dependencies
 
-| Package    | Purpose                        |
-|------------|--------------------------------|
-| `requests` | HTTP calls (weather API + Discord webhook) |
-| `pytz`     | Timezone handling (Asia/Kuala_Lumpur) |
+| Package | Purpose |
+|---|---|
+| `requests` | HTTP requests to Open-Meteo and Discord Webhooks |
+| `pytz` | Timezone management (`Asia/Kuala_Lumpur`) |
+| `google-genai` | Official Google GenAI SDK for Gemini models |
+| `python-dotenv` | Loads API keys and configurations from `.env` |
 
-Dependencies are installed automatically by the GitHub Actions workflow.
+---
+
+## Prerequisites
+
+- Python 3.10+
+- PIP
+- A Discord server with webhook permissions
+- A Google Gemini API key
+
+---
 
 ## Local Setup Guide
-
-Follow these steps to run the bot on your local machine for development or testing.
-
-### Prerequisites
-
-- **Python**
-- **pip**
 
 ### 1. Clone the Repository
 
@@ -84,87 +69,69 @@ cd discord-automation
 ### 2. Install Dependencies
 
 ```bash
-pip install requests pytz
+pip install -r requirements.txt
 ```
 
-### 3. Configure the Webhook URL
+### 4. Configure Environment Variables
 
-Set the `DISCORD_WEBHOOK` environment variable to your Discord webhook URL.
-
-**macOS / Linux:**
-
-```bash
-export DISCORD_WEBHOOK="https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN"
+```
+.env.example -> .env
+```
+Add your credentials
+```
+DISCORD_WEBHOOK="https://discord.com/api/webhooks/YOUR_WEBHOOK_ID/YOUR_WEBHOOK_TOKEN"
+GEMINI_API_KEY="YOUR_GEMINI_API_KEY"
 ```
 
-**Windows (Command Prompt):**
+### 5. Run Manually
+Run the script directly to test:
 
-```cmd
-set DISCORD_WEBHOOK=https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN
 ```
-
-**Windows (PowerShell):**
-
-```powershell
-$env:DISCORD_WEBHOOK = "https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN"
+python3 script.py
 ```
+>Note: If you run outside greeting hours [8-9 AM, 12-1 PM, 5-6 PM, 9-10 PM], the script will exit without posting. Temporarily adjust the time check in script.py to test immediately
 
-### 4. Run the Script
+---
 
-```bash
-python script.py
+## Scheduling Automation
+
+### Linux / macOS / WSL (Crontab)
+Open your user crontab editor:
+
 ```
-
-### 5. Schedule with Crontab (macOS / Linux)
-
-To replicate the GitHub Actions schedule locally, use **crontab** to run the script automatically every 5 minutes.
-
-**Open the crontab editor:**
-
-```bash
 crontab -e
 ```
-
-**Add the following line**, replacing the paths with your actual Python executable and project directory:
-
-```cron
-*/5 * * * * DISCORD_WEBHOOK="https://discord.com/api/webhooks/YOUR_ID/YOUR_TOKEN" /usr/bin/python3 /path/to/discord-automation/script.py >> /path/to/discord-automation/cron.log 2>&1
+Add an entry to execute the script at the top of every hour. Make sure to use absolute paths for both your directory and your Python binary:
 ```
+0 * * * * cd /home/yourusername/discord-automation && /usr/bin/python3 script.py >> cron.log 2>&1
+```
+>Tip: Find your Python executable path using which python3 and your current folder path using pwd
 
-> **Tip:** Run `which python3` to find your Python path, and `pwd` inside the project folder to get the full path.
-
-**Verify the crontab was saved:**
-
-```bash
+Verify your scheduled task:
+```
 crontab -l
 ```
 
-You should see the entry you just added. The script will now run every 5 minutes and log output to `cron.log`.
+### Windows (Task Scheduler)
+1. Open Task Scheduler and select Create Basic Task.
 
-**To stop the scheduled job**, open `crontab -e` again and delete or comment out the line.
+2. Name it Discord Weather Bot and set Trigger to Daily.
 
-#### Windows — Task Scheduler
+3. Under Action, select Start a program:
+	- Program/script: wsl.exe (if running inside WSL) or the path to python.exe
+	- Add arguments:
+		- If WSL: bash -c "cd /home/yourusername/discord-automation && /usr/bin/python3 script.py"
+		- If native Windows: script.py
+	- Start in: C:\path\to\discord-automation (for native Windows)
 
-Windows does not have crontab. Use **Task Scheduler** instead:
+4. Finish and configure the task to run repeatedly as needed.
 
-1. Open **Task Scheduler** (search for it in the Start menu).
-2. Click **Create Basic Task…** and give it a name (e.g. `Discord Automation`).
-3. Set the trigger to **Daily**, then edit the trigger to repeat every **5 minutes** for a duration of **1 day**.
-4. Set the action to **Start a program**:
-   - Program: `python` (or the full path, e.g. `C:\Python311\python.exe`)
-   - Arguments: `C:\path\to\discord-automation\script.py`
-   - Start in: `C:\path\to\discord-automation`
-5. In **Properties → Environment Variables** (or a wrapper `.bat` file), set `DISCORD_WEBHOOK` to your webhook URL.
-6. Click **Finish**.
+---
 
-### Notes
+## APIs & Data Sources
 
-- The deduplication state is stored in `last_sent.txt` in the project root. Delete this file to force-resend a greeting during testing.
-- Weather data is fetched live from the [Open-Meteo API](https://open-meteo.com/) — no API key is required.
-- To test outside of a greeting window, temporarily adjust the hour-checking conditions in `script.py` to match the current time.
+- Weather & Forecast: Open-Meteo Weather Forecast API (Subang Jaya: 3.0438, 101.5806). Free, no authentication required.
 
-## Weather API
+- Air Quality: Open-Meteo Air Quality API providing real-time US AQI calculations.
 
-Weather data is provided by [Open-Meteo](https://open-meteo.com/) — a free, open-source weather API. No API key required.
-
-The location is set to **Subang, Selangor, Malaysia** (latitude `3.043`, longitude `101.580`).
+- Intelligence: Google Gemini API using gemini-3.5-flash for fast, lightweight contextual text generation.
