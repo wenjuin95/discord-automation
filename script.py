@@ -129,12 +129,17 @@ Have a great day everyone 🚀
     print(message)
 
     if WEBHOOK_URL:
-        requests.post(WEBHOOK_URL, json={"username": "MAKAN", "content": message})
-        print("Webhook sent successfully.")
+        response = requests.post(WEBHOOK_URL, json={"username": "MAKAN", "content": message})
 
-        # Save state to prevent duplicate sending
-        with open(state_file, "w") as f:
-            f.write(current_state)
+        if response.status_code in (200, 204):
+            print("Webhook sent successfully.")
+
+            # Save state to prevent duplicate sending
+            with open(state_file, "w") as f:
+                f.write(current_state)
+        else:
+            print(f"❌ Failed to send webhook. Discord returned Status Code: {response.status_code}")
+            print(f"Discord Error Message: {response.text}")
     else:
         print("DISCORD_WEBHOOK environment variable not set. Message not sent.")
 
