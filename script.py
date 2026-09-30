@@ -25,12 +25,12 @@ WX = {
 }
 
 def get_aqi_label(v):
-    if v <= 50: return "Good"
-    if v <= 100: return "Moderate"
-    if v <= 150: return "Unhealthy for sensitive groups"
-    if v <= 200: return "Unhealthy"
-    if v <= 300: return "Very unhealthy"
-    return "Hazardous"
+    if v <= 50: return "🟢 Good"
+    if v <= 100: return "🟡 Moderate"
+    if v <= 150: return "🟠 Unhealthy for sensitive groups"
+    if v <= 200: return "🔴 Unhealthy"
+    if v <= 300: return "🟣 Very unhealthy"
+    return "⚫ Hazardous"
 
 def get_weather_icon(code):
     match code:
@@ -144,4 +144,4 @@ Have a great day everyone 🚀
         print("DISCORD_WEBHOOK environment variable not set. Message not sent.")
 
 else:
-    print("Not the correct time. Exiting script.")
+    print(f"{now.strftime("%Y-%m-%d %H:%M:%S")} -> Not the correct time. Exiting script.")
